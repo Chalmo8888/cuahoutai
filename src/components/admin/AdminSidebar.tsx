@@ -2,6 +2,12 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { ListTodo, FolderOpen, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 const navItems = [
   { to: '/admin/tasks', icon: ListTodo, label: '任务管理', exact: true },
@@ -10,7 +16,7 @@ const navItems = [
 
 export default function AdminSidebar() {
   const location = useLocation();
-  const { logout } = useAuth();
+  const { logout, adminName } = useAuth();
 
   const isActive = (path: string, exact?: boolean) => {
     if (exact) return location.pathname === path;
@@ -49,15 +55,36 @@ export default function AdminSidebar() {
         ))}
       </nav>
 
-      {/* Logout */}
+      {/* User section at bottom */}
       <div className="p-3 border-t border-sidebar-border">
-        <button
-          onClick={logout}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-destructive transition-all"
-        >
-          <LogOut className="h-5 w-5" />
-          退出登录
-        </button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg hover:bg-sidebar-accent/50 transition-colors">
+              <Avatar className="h-9 w-9">
+                <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
+                  {adminName[0]}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 text-left">
+                <p className="text-sm font-medium text-sidebar-foreground">{adminName}</p>
+                <p className="text-xs text-muted-foreground">管理员</p>
+              </div>
+            </button>
+          </PopoverTrigger>
+          <PopoverContent 
+            side="top" 
+            align="start" 
+            className="w-48 p-2"
+          >
+            <button
+              onClick={logout}
+              className="flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-destructive hover:bg-destructive/10 transition-colors"
+            >
+              <LogOut className="h-4 w-4" />
+              退出登录
+            </button>
+          </PopoverContent>
+        </Popover>
       </div>
     </aside>
   );
