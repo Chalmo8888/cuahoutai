@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Settings, Home, Grid3X3, GitBranch, Clock, BookOpen, Store, Fingerprint, ChevronLeft, ChevronRight } from "lucide-react";
+import { Settings, Home, Grid3X3, GitBranch, Clock, BookOpen, Store, Fingerprint, ChevronLeft, ChevronRight, ArrowUp } from "lucide-react";
 import { useData } from "@/contexts/DataContext";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -153,18 +153,34 @@ const Index = () => {
         <div className="w-full max-w-2xl mb-8">
           <div 
             className={cn(
-              "bg-white rounded-2xl shadow-sm border p-1 transition-all duration-300",
+              "relative bg-white rounded-2xl shadow-lg transition-all duration-300",
               isInputHighlighted 
-                ? "border-blue-400 ring-2 ring-blue-100 shadow-md" 
-                : "border-gray-100"
+                ? "shadow-xl" 
+                : ""
             )}
+            style={{
+              background: "linear-gradient(white, white) padding-box, linear-gradient(135deg, hsl(217 91% 90%), hsl(221 83% 95%), hsl(250 80% 92%)) border-box",
+              border: "2px solid transparent",
+            }}
           >
             <textarea
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="从下方选择一个任务，或直接输入你的需求"
-              className="w-full h-24 px-5 py-4 text-base resize-none focus:outline-none rounded-xl bg-transparent placeholder:text-gray-300"
+              placeholder="描述您想要的自动化任务"
+              className="w-full h-32 px-5 py-4 text-base resize-none focus:outline-none rounded-2xl bg-transparent placeholder:text-gray-400"
             />
+            {/* Send button */}
+            <button
+              className={cn(
+                "absolute bottom-4 right-4 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200",
+                inputValue.trim() 
+                  ? "bg-gray-700 hover:bg-gray-800 text-white shadow-md" 
+                  : "bg-gray-100 text-gray-400 cursor-default"
+              )}
+              disabled={!inputValue.trim()}
+            >
+              <ArrowUp className="h-4 w-4" />
+            </button>
           </div>
         </div>
 
