@@ -146,15 +146,10 @@ export default function TaskDrawer({ open, onClose, task }: TaskDrawerProps) {
             <p className="text-xs text-muted-foreground">该内容不会直接展示给用户，仅在点击任务时填入输入框</p>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="order">排序</Label>
-            <Input
-              id="order"
-              type="number"
-              value={formData.order}
-              onChange={(e) => setFormData(prev => ({ ...prev, order: parseInt(e.target.value) || 0 }))}
-              placeholder="数字越小越靠前"
-            />
+          <div className="rounded-lg bg-muted/50 p-3">
+            <p className="text-xs text-muted-foreground">
+              任务展示顺序请在任务列表中通过拖拽调整
+            </p>
           </div>
 
           <div className="flex items-center justify-between py-2">

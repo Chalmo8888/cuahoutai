@@ -12,6 +12,7 @@ interface DataContextType {
   deleteCategory: (id: string) => void;
   getCategoryById: (id: string) => Category | undefined;
   getTasksByCategory: (categoryId: string) => Task[];
+  reorderTasks: (orderedIds: string[]) => void;
 }
 
 const DataContext = createContext<DataContextType | null>(null);
@@ -69,6 +70,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
     return tasks.filter(task => task.categoryId === categoryId);
   };
 
+  const reorderTasks = (orderedIds: string[]) => {
+    setTasks(prev => {
+      return prev.map(task => {
+        const newOrder = orderedIds.indexOf(task.id);
+        if (newOrder !== -1) {
+          return { ...task, order: newOrder, updatedAt: new Date() };
+        }
+        return task;
+      });
+    });
+  };
+
   return (
     <DataContext.Provider
       value={{
@@ -82,6 +95,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         deleteCategory,
         getCategoryById,
         getTasksByCategory,
+        reorderTasks,
       }}
     >
       {children}
