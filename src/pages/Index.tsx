@@ -18,7 +18,7 @@ const navItems = [
 const Index = () => {
   const { categories, tasks } = useData();
   const [inputValue, setInputValue] = useState("");
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("all");
   const [isInputHighlighted, setIsInputHighlighted] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -34,17 +34,10 @@ const Index = () => {
   // Sort categories by order
   const sortedCategories = [...categories].sort((a, b) => a.order - b.order);
 
-  // Set default selected category
-  useEffect(() => {
-    if (sortedCategories.length > 0 && !selectedCategoryId) {
-      setSelectedCategoryId(sortedCategories[0].id);
-    }
-  }, [sortedCategories, selectedCategoryId]);
-
-  // Get tasks for selected category
-  const filteredTasks = visibleTasks.filter(
-    task => task.categoryId === selectedCategoryId
-  );
+  // Get tasks for selected category (all = show all visible tasks)
+  const filteredTasks = selectedCategoryId === "all" 
+    ? visibleTasks 
+    : visibleTasks.filter(task => task.categoryId === selectedCategoryId);
 
   // Check scroll state
   const checkScroll = () => {
@@ -203,6 +196,18 @@ const Index = () => {
               className="flex gap-3 overflow-x-auto scrollbar-hide px-1 py-1 scroll-smooth"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
+              {/* 全部分类按钮 */}
+              <button
+                onClick={() => handleCategoryChange("all")}
+                className={cn(
+                  "rounded-full text-sm whitespace-nowrap transition-all duration-200 shrink-0",
+                  selectedCategoryId === "all"
+                    ? "px-6 py-2.5 bg-blue-500 text-white font-semibold shadow-md"
+                    : "px-5 py-2 bg-white text-gray-500 font-medium border border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700"
+                )}
+              >
+                全部
+              </button>
               {sortedCategories.map((category) => (
                 <button
                   key={category.id}
