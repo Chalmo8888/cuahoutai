@@ -26,7 +26,6 @@ export default function CategoryDialog({ open, onClose, category }: CategoryDial
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    order: 0,
   });
 
   useEffect(() => {
@@ -34,13 +33,11 @@ export default function CategoryDialog({ open, onClose, category }: CategoryDial
       setFormData({
         name: category.name,
         description: category.description || '',
-        order: category.order,
       });
     } else {
       setFormData({
         name: '',
         description: '',
-        order: 0,
       });
     }
   }, [category]);
@@ -93,16 +90,9 @@ export default function CategoryDialog({ open, onClose, category }: CategoryDial
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="cat-order">排序</Label>
-            <Input
-              id="cat-order"
-              type="number"
-              value={formData.order}
-              onChange={(e) => setFormData(prev => ({ ...prev, order: parseInt(e.target.value) || 0 }))}
-              placeholder="数字越小越靠前"
-            />
-          </div>
+          <p className="text-xs text-muted-foreground">
+            分类展示顺序请在分类列表中通过拖拽调整
+          </p>
 
           <div className="flex gap-3 pt-2">
             <Button type="button" variant="outline" className="flex-1" onClick={onClose}>
