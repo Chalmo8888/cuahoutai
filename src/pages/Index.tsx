@@ -260,14 +260,15 @@ const Index = () => {
           </div>
         </div>
 
-        {/* 任务列表 */}
+        {/* 任务列表 - 固定高度滚动区域 */}
         <div 
           ref={taskListRef}
-          className="w-full max-w-2xl flex-1 overflow-y-auto pb-8"
+          className="w-full max-w-2xl h-64 overflow-y-auto rounded-xl"
+          style={{ scrollbarWidth: "thin" }}
         >
           <div 
             className={cn(
-              "transition-all duration-200",
+              "transition-all duration-200 pb-2",
               isTransitioning ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"
             )}
           >
