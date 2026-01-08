@@ -9,7 +9,6 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import AdminLayout from "./layouts/AdminLayout";
-import Dashboard from "./pages/admin/Dashboard";
 import TasksPage from "./pages/admin/TasksPage";
 import CategoriesPage from "./pages/admin/CategoriesPage";
 
@@ -27,7 +26,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<Dashboard />} />
+                <Route index element={<Navigate to="/admin/tasks" replace />} />
                 <Route path="tasks" element={<TasksPage />} />
                 <Route path="categories" element={<CategoriesPage />} />
               </Route>
