@@ -263,8 +263,8 @@ const Index = () => {
         {/* 任务列表 - 固定高度滚动区域 */}
         <div 
           ref={taskListRef}
-          className="w-full max-w-2xl h-64 overflow-y-auto rounded-xl"
-          style={{ scrollbarWidth: "thin" }}
+          className="w-full max-w-2xl h-64 overflow-y-auto rounded-xl scrollbar-hide"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           <div 
             className={cn(
