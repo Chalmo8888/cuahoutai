@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Settings, Home, Grid3X3, GitBranch, Clock, BookOpen, Store, Fingerprint, ChevronLeft, ChevronRight } from "lucide-react";
 import { useData } from "@/contexts/DataContext";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const navItems = [
   { icon: Home, label: "首页", active: true },
@@ -18,7 +19,10 @@ const Index = () => {
   const { categories, tasks } = useData();
   const [inputValue, setInputValue] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
+  const [isInputHighlighted, setIsInputHighlighted] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const taskListRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
@@ -71,11 +75,41 @@ const Index = () => {
   };
 
   const handleCategoryChange = (categoryId: string) => {
-    setSelectedCategoryId(categoryId);
+    if (categoryId === selectedCategoryId) return;
+    
+    setIsTransitioning(true);
+    
+    // Scroll task list to top
+    if (taskListRef.current) {
+      taskListRef.current.scrollTop = 0;
+    }
+    
+    setTimeout(() => {
+      setSelectedCategoryId(categoryId);
+      setTimeout(() => setIsTransitioning(false), 50);
+    }, 150);
   };
 
   const handleTaskClick = (prompt: string) => {
     setInputValue(prompt);
+    
+    // Highlight input feedback
+    setIsInputHighlighted(true);
+    setTimeout(() => setIsInputHighlighted(false), 500);
+    
+    // Toast feedback
+    toast.success("已填入输入框", {
+      duration: 2000,
+      position: "top-center",
+      style: {
+        background: "#fff",
+        color: "#374151",
+        fontSize: "14px",
+        padding: "12px 16px",
+        borderRadius: "12px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+      },
+    });
   };
 
   return (
@@ -124,12 +158,19 @@ const Index = () => {
 
         {/* 任务输入框 */}
         <div className="w-full max-w-2xl mb-8">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-1">
+          <div 
+            className={cn(
+              "bg-white rounded-2xl shadow-sm border p-1 transition-all duration-300",
+              isInputHighlighted 
+                ? "border-blue-400 ring-2 ring-blue-100 shadow-md" 
+                : "border-gray-100"
+            )}
+          >
             <textarea
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="描述您想要的自动化任务"
-              className="w-full h-24 px-5 py-4 text-base resize-none focus:outline-none rounded-xl bg-transparent placeholder:text-gray-400"
+              placeholder="从下方选择一个任务，或直接输入你的需求"
+              className="w-full h-24 px-5 py-4 text-base resize-none focus:outline-none rounded-xl bg-transparent placeholder:text-gray-300"
             />
           </div>
         </div>
@@ -137,13 +178,21 @@ const Index = () => {
         {/* 分类横向列表 */}
         <div className="w-full max-w-2xl mb-6">
           <div className="relative flex items-center">
+            {/* Left fade mask */}
+            <div 
+              className={cn(
+                "absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-blue-50/80 to-transparent z-[5] pointer-events-none transition-opacity duration-200",
+                canScrollLeft ? "opacity-100" : "opacity-0"
+              )}
+            />
+            
             {/* Left scroll button */}
             {canScrollLeft && (
               <button
                 onClick={() => scroll("left")}
-                className="absolute left-0 z-10 w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors"
+                className="absolute left-0 z-10 w-7 h-7 flex items-center justify-center bg-white/90 rounded-full shadow-sm hover:bg-white hover:shadow-md transition-all"
               >
-                <ChevronLeft className="h-4 w-4 text-gray-600" />
+                <ChevronLeft className="h-4 w-4 text-gray-500" />
               </button>
             )}
 
@@ -159,10 +208,10 @@ const Index = () => {
                   key={category.id}
                   onClick={() => handleCategoryChange(category.id)}
                   className={cn(
-                    "px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 shrink-0",
+                    "rounded-full text-sm whitespace-nowrap transition-all duration-200 shrink-0",
                     selectedCategoryId === category.id
-                      ? "bg-[#1a1f36] text-white shadow-md"
-                      : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                      ? "px-6 py-2.5 bg-[#1a1f36] text-white font-semibold shadow-md"
+                      : "px-5 py-2 bg-white text-gray-500 font-medium border border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700"
                   )}
                 >
                   {category.name}
@@ -174,42 +223,57 @@ const Index = () => {
             {canScrollRight && (
               <button
                 onClick={() => scroll("right")}
-                className="absolute right-0 z-10 w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors"
+                className="absolute right-0 z-10 w-7 h-7 flex items-center justify-center bg-white/90 rounded-full shadow-sm hover:bg-white hover:shadow-md transition-all"
               >
-                <ChevronRight className="h-4 w-4 text-gray-600" />
+                <ChevronRight className="h-4 w-4 text-gray-500" />
               </button>
             )}
+            
+            {/* Right fade mask */}
+            <div 
+              className={cn(
+                "absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-blue-50/80 to-transparent z-[5] pointer-events-none transition-opacity duration-200",
+                canScrollRight ? "opacity-100" : "opacity-0"
+              )}
+            />
           </div>
         </div>
 
         {/* 任务列表 */}
-        <div className="w-full max-w-2xl flex-1 overflow-y-auto pb-8">
-          {filteredTasks.length > 0 ? (
-            <div className="flex flex-col gap-3 animate-in fade-in duration-300">
-              {filteredTasks.map((task) => (
-                <button
-                  key={task.id}
-                  onClick={() => handleTaskClick(task.prompt)}
-                  className="group w-full bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-5 text-left transition-all duration-200 hover:shadow-md hover:border-gray-200 hover:-translate-y-0.5"
-                >
-                  <h3 className="text-base font-medium text-gray-800 group-hover:text-[#1a1f36] transition-colors">
-                    {task.name}
-                  </h3>
-                  {/* Hover tooltip effect - optional description preview */}
-                  <p className="mt-2 text-sm text-gray-500 line-clamp-2 opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-20 transition-all duration-200 overflow-hidden">
-                    {task.prompt}
-                  </p>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-              <div className="w-16 h-16 mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                <Grid3X3 className="h-8 w-8 text-gray-300" />
+        <div 
+          ref={taskListRef}
+          className="w-full max-w-2xl flex-1 overflow-y-auto pb-8"
+        >
+          <div 
+            className={cn(
+              "transition-all duration-200",
+              isTransitioning ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"
+            )}
+          >
+            {filteredTasks.length > 0 ? (
+              <div className="flex flex-col gap-3">
+                {filteredTasks.map((task) => (
+                  <button
+                    key={task.id}
+                    onClick={() => handleTaskClick(task.prompt)}
+                    className="group w-full bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-5 text-left transition-all duration-200 hover:shadow-lg hover:border-gray-200 hover:-translate-y-1 cursor-pointer active:scale-[0.99]"
+                  >
+                    <h3 className="text-base font-medium text-gray-800 group-hover:text-[#1a1f36] transition-colors">
+                      {task.name}
+                    </h3>
+                    {/* Hover description - only visible on hover */}
+                    <p className="mt-2 text-xs text-gray-400 line-clamp-2 opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-12 transition-all duration-200 overflow-hidden">
+                      {task.prompt}
+                    </p>
+                  </button>
+                ))}
               </div>
-              <p className="text-sm">该分类下暂无任务</p>
-            </div>
-          )}
+            ) : (
+              <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+                <p className="text-sm">该分类下暂无任务</p>
+              </div>
+            )}
+          </div>
         </div>
       </main>
     </div>
