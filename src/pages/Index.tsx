@@ -166,7 +166,7 @@ const Index = () => {
             <textarea
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="描述您想要的自动化任务"
+              placeholder="从下方选择一个任务，或直接输入你的需求"
               className="w-full h-32 px-5 py-4 text-base resize-none focus:outline-none rounded-2xl bg-transparent placeholder:text-gray-400"
             />
             {/* Send button */}
