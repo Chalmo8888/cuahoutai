@@ -1,11 +1,10 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, ListTodo, FolderOpen, LogOut } from 'lucide-react';
+import { ListTodo, FolderOpen, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { to: '/admin', icon: LayoutDashboard, label: '概览', exact: true },
-  { to: '/admin/tasks', icon: ListTodo, label: '任务管理' },
+  { to: '/admin/tasks', icon: ListTodo, label: '任务管理', exact: true },
   { to: '/admin/categories', icon: FolderOpen, label: '分类管理' },
 ];
 
