@@ -263,7 +263,7 @@ const Index = () => {
                     </h3>
                     {/* Hover description - only visible on hover, only when description exists */}
                     {task.description && (
-                      <p className="mt-2 text-xs text-gray-400 line-clamp-2 opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-12 transition-all duration-200 overflow-hidden">
+                      <p className="mt-2 text-xs text-gray-400 line-clamp-1 opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-8 transition-all duration-200 overflow-hidden">
                         {task.description}
                       </p>
                     )}
