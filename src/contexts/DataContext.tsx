@@ -7,12 +7,13 @@ interface DataContextType {
   addTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateTask: (id: string, task: Partial<Task>) => void;
   deleteTask: (id: string) => void;
-  addCategory: (category: Omit<Category, 'id' | 'createdAt'>) => void;
+  addCategory: (category: Omit<Category, 'id' | 'createdAt' | 'order'>) => void;
   updateCategory: (id: string, category: Partial<Category>) => void;
   deleteCategory: (id: string) => void;
   getCategoryById: (id: string) => Category | undefined;
   getTasksByCategory: (categoryId: string) => Task[];
   reorderTasks: (orderedIds: string[]) => void;
+  reorderCategories: (orderedIds: string[]) => void;
 }
 
 const DataContext = createContext<DataContextType | null>(null);
@@ -43,10 +44,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setTasks(prev => prev.filter(task => task.id !== id));
   };
 
-  const addCategory = (category: Omit<Category, 'id' | 'createdAt'>) => {
+  const addCategory = (category: Omit<Category, 'id' | 'createdAt' | 'order'>) => {
+    const maxOrder = categories.reduce((max, c) => Math.max(max, c.order), 0);
     const newCategory: Category = {
       ...category,
       id: Date.now().toString(),
+      order: maxOrder + 1,
       createdAt: new Date(),
     };
     setCategories(prev => [...prev, newCategory]);
@@ -82,6 +85,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const reorderCategories = (orderedIds: string[]) => {
+    setCategories(prev => {
+      return prev.map(cat => {
+        const newOrder = orderedIds.indexOf(cat.id);
+        if (newOrder !== -1) {
+          return { ...cat, order: newOrder };
+        }
+        return cat;
+      });
+    });
+  };
+
   return (
     <DataContext.Provider
       value={{
@@ -96,6 +111,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         getCategoryById,
         getTasksByCategory,
         reorderTasks,
+        reorderCategories,
       }}
     >
       {children}
