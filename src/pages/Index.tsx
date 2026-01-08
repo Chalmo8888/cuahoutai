@@ -210,7 +210,7 @@ const Index = () => {
                   className={cn(
                     "rounded-full text-sm whitespace-nowrap transition-all duration-200 shrink-0",
                     selectedCategoryId === category.id
-                      ? "px-6 py-2.5 bg-[#1a1f36] text-white font-semibold shadow-md"
+                      ? "px-6 py-2.5 bg-blue-500 text-white font-semibold shadow-md"
                       : "px-5 py-2 bg-white text-gray-500 font-medium border border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700"
                   )}
                 >
