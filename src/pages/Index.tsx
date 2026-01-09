@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Settings, Home, Grid3X3, GitBranch, Clock, BookOpen, Store, Fingerprint, ChevronLeft, ChevronRight, ArrowUp } from "lucide-react";
+import { Settings, Home, Grid3X3, GitBranch, Clock, BookOpen, Store, Fingerprint, ChevronLeft, ChevronRight, ArrowUp, Search } from "lucide-react";
 import { useData } from "@/contexts/DataContext";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -19,6 +19,7 @@ const Index = () => {
   const { categories, tasks } = useData();
   const [inputValue, setInputValue] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [isInputHighlighted, setIsInputHighlighted] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -35,9 +36,16 @@ const Index = () => {
   const sortedCategories = [...categories].sort((a, b) => a.order - b.order);
 
   // Get tasks for selected category (all = show all visible tasks)
-  const filteredTasks = selectedCategoryId === "all" 
+  const categoryTasks = selectedCategoryId === "all" 
     ? visibleTasks 
     : visibleTasks.filter(task => task.categoryId === selectedCategoryId);
+
+  // Apply search filter on top of category filter
+  const filteredTasks = searchQuery.trim()
+    ? categoryTasks.filter(task => 
+        task.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : categoryTasks;
 
   // Check scroll state
   const checkScroll = () => {
@@ -71,6 +79,7 @@ const Index = () => {
     if (categoryId === selectedCategoryId) return;
     
     setIsTransitioning(true);
+    setSearchQuery(""); // Clear search when changing category
     
     // Scroll task list to top
     if (taskListRef.current) {
@@ -184,79 +193,94 @@ const Index = () => {
           </div>
         </div>
 
-        {/* 分类横向列表 */}
+        {/* 分类横向列表 + 搜索框 */}
         <div className="w-full max-w-2xl mb-6">
-          <div className="relative flex items-center">
-            {/* Left fade mask */}
-            <div 
-              className={cn(
-                "absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-blue-50/80 to-transparent z-[5] pointer-events-none transition-opacity duration-200",
-                canScrollLeft ? "opacity-100" : "opacity-0"
-              )}
-            />
-            
-            {/* Left scroll button */}
-            {canScrollLeft && (
-              <button
-                onClick={() => scroll("left")}
-                className="absolute left-0 z-10 w-7 h-7 flex items-center justify-center bg-white/90 rounded-full shadow-sm hover:bg-white hover:shadow-md transition-all"
-              >
-                <ChevronLeft className="h-4 w-4 text-gray-500" />
-              </button>
-            )}
-
-            {/* Categories container */}
-            <div
-              ref={scrollContainerRef}
-              onScroll={checkScroll}
-              className="flex gap-3 overflow-x-auto scrollbar-hide px-1 py-1 scroll-smooth"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-            >
-              {/* 全部分类按钮 */}
-              <button
-                onClick={() => handleCategoryChange("all")}
+          <div className="relative flex items-center gap-4">
+            {/* Categories area */}
+            <div className="relative flex-1 flex items-center min-w-0">
+              {/* Left fade mask */}
+              <div 
                 className={cn(
-                  "rounded-full text-sm whitespace-nowrap transition-all duration-200 shrink-0",
-                  selectedCategoryId === "all"
-                    ? "px-6 py-2.5 bg-blue-500 text-white font-semibold shadow-md"
-                    : "px-5 py-2 bg-white text-gray-500 font-medium border border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700"
+                  "absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-blue-50/80 to-transparent z-[5] pointer-events-none transition-opacity duration-200",
+                  canScrollLeft ? "opacity-100" : "opacity-0"
                 )}
-              >
-                全部
-              </button>
-              {sortedCategories.map((category) => (
+              />
+              
+              {/* Left scroll button */}
+              {canScrollLeft && (
                 <button
-                  key={category.id}
-                  onClick={() => handleCategoryChange(category.id)}
+                  onClick={() => scroll("left")}
+                  className="absolute left-0 z-10 w-7 h-7 flex items-center justify-center bg-white/90 rounded-full shadow-sm hover:bg-white hover:shadow-md transition-all"
+                >
+                  <ChevronLeft className="h-4 w-4 text-gray-500" />
+                </button>
+              )}
+
+              {/* Categories container */}
+              <div
+                ref={scrollContainerRef}
+                onScroll={checkScroll}
+                className="flex gap-3 overflow-x-auto scrollbar-hide px-1 py-1 scroll-smooth"
+                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+              >
+                {/* 全部分类按钮 */}
+                <button
+                  onClick={() => handleCategoryChange("all")}
                   className={cn(
                     "rounded-full text-sm whitespace-nowrap transition-all duration-200 shrink-0",
-                    selectedCategoryId === category.id
+                    selectedCategoryId === "all"
                       ? "px-6 py-2.5 bg-blue-500 text-white font-semibold shadow-md"
                       : "px-5 py-2 bg-white text-gray-500 font-medium border border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700"
                   )}
                 >
-                  {category.name}
+                  全部
                 </button>
-              ))}
+                {sortedCategories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => handleCategoryChange(category.id)}
+                    className={cn(
+                      "rounded-full text-sm whitespace-nowrap transition-all duration-200 shrink-0",
+                      selectedCategoryId === category.id
+                        ? "px-6 py-2.5 bg-blue-500 text-white font-semibold shadow-md"
+                        : "px-5 py-2 bg-white text-gray-500 font-medium border border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700"
+                    )}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
+
+              {/* Right scroll button */}
+              {canScrollRight && (
+                <button
+                  onClick={() => scroll("right")}
+                  className="absolute right-0 z-10 w-7 h-7 flex items-center justify-center bg-white/90 rounded-full shadow-sm hover:bg-white hover:shadow-md transition-all"
+                >
+                  <ChevronRight className="h-4 w-4 text-gray-500" />
+                </button>
+              )}
+              
+              {/* Right fade mask */}
+              <div 
+                className={cn(
+                  "absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-blue-50/80 to-transparent z-[5] pointer-events-none transition-opacity duration-200",
+                  canScrollRight ? "opacity-100" : "opacity-0"
+                )}
+              />
             </div>
 
-            {/* Right scroll button */}
-            {canScrollRight && (
-              <button
-                onClick={() => scroll("right")}
-                className="absolute right-0 z-10 w-7 h-7 flex items-center justify-center bg-white/90 rounded-full shadow-sm hover:bg-white hover:shadow-md transition-all"
-              >
-                <ChevronRight className="h-4 w-4 text-gray-500" />
-              </button>
-            )}
-            
-            {/* Right fade mask */}
-            <div 
-              className={cn(
-                "absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-blue-50/80 to-transparent z-[5] pointer-events-none transition-opacity duration-200",
-                canScrollRight ? "opacity-100" : "opacity-0"
-              )}
-            />
+            {/* 搜索框 */}
+            <div className="relative shrink-0 w-[220px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="搜索任务名称"
+                className="w-full h-10 pl-9 pr-4 text-sm bg-white rounded-full border border-gray-200 shadow-sm placeholder:text-gray-400 focus:outline-none focus:border-gray-300 focus:shadow-md transition-all"
+              />
+            </div>
           </div>
         </div>
 
