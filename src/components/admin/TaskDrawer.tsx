@@ -34,7 +34,6 @@ export default function TaskDrawer({ open, onClose, task }: TaskDrawerProps) {
   const [formData, setFormData] = useState({
     name: '',
     categoryId: '',
-    description: '',
     prompt: '',
     isVisible: true,
     order: 0,
@@ -45,7 +44,6 @@ export default function TaskDrawer({ open, onClose, task }: TaskDrawerProps) {
       setFormData({
         name: task.name,
         categoryId: task.categoryId,
-        description: task.description || '',
         prompt: task.prompt,
         isVisible: task.isVisible,
         order: task.order,
@@ -54,7 +52,6 @@ export default function TaskDrawer({ open, onClose, task }: TaskDrawerProps) {
       setFormData({
         name: '',
         categoryId: categories[0]?.id || '',
-        description: '',
         prompt: '',
         isVisible: true,
         order: 0,
@@ -122,17 +119,6 @@ export default function TaskDrawer({ open, onClose, task }: TaskDrawerProps) {
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="description">任务描述</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="简要说明该任务的用途"
-              rows={2}
-            />
-            <p className="text-xs text-muted-foreground">该描述将展示在前台任务列表中，用于说明任务用途</p>
-          </div>
 
           <div className="space-y-2">
             <Label htmlFor="prompt">任务提示词</Label>
