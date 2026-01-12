@@ -35,17 +35,19 @@ const Index = () => {
   // Sort categories by order
   const sortedCategories = [...categories].sort((a, b) => a.order - b.order);
 
-  // Get tasks for selected category (all = show all visible tasks)
-  const categoryTasks = selectedCategoryId === "all" 
-    ? visibleTasks 
-    : visibleTasks.filter(task => task.categoryId === selectedCategoryId);
-
-  // Apply search filter on top of category filter
-  const filteredTasks = searchQuery.trim()
-    ? categoryTasks.filter(task => 
+  // Apply search filter first (always searches across ALL visible tasks)
+  const searchedTasks = searchQuery.trim()
+    ? visibleTasks.filter(task => 
         task.name.toLowerCase().includes(searchQuery.toLowerCase())
       )
-    : categoryTasks;
+    : null;
+
+  // If searching, show search results; otherwise filter by category
+  const filteredTasks = searchedTasks !== null
+    ? searchedTasks
+    : selectedCategoryId === "all" 
+      ? visibleTasks 
+      : visibleTasks.filter(task => task.categoryId === selectedCategoryId);
 
   // Check scroll state
   const checkScroll = () => {
@@ -79,7 +81,7 @@ const Index = () => {
     if (categoryId === selectedCategoryId) return;
     
     setIsTransitioning(true);
-    setSearchQuery(""); // Clear search when changing category
+    // Keep search query when changing category
     
     // Scroll task list to top
     if (taskListRef.current) {
